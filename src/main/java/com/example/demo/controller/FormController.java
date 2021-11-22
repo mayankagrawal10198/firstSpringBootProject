@@ -1,7 +1,8 @@
 package com.example.demo.controller;
 
-import com.example.demo.service.UserDetailsService;
+import com.example.demo.beans.UserDetailsBean;
 
+import com.example.demo.service.UserDetailsServiceImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
@@ -16,9 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @Controller
 public class FormController {
 
-	AtomicLong counter = new AtomicLong();
-
-	List<UserDetailsService> users = new ArrayList<>();
+	UserDetailsServiceImpl userDetails = new UserDetailsServiceImpl();
 
 	@GetMapping("/")
 	public String redirectLogin() {
@@ -36,15 +35,15 @@ public class FormController {
 //										@RequestParam String emailId,
 //										@RequestParam String dob) {
 //
-//		UserDetailsService userDetailsService = new UserDetailsService();
-//		userDetailsService.setFirstName(firstName);
-//		userDetailsService.setLastName(lastName);
-//		userDetailsService.setEmailId(emailId);
-//		userDetailsService.setDob(dob);
+//		UserDetailsBean userDetailsBean = new UserDetailsBean();
+//		userDetailsBean.setFirstName(firstName);
+//		userDetailsBean.setLastName(lastName);
+//		userDetailsBean.setEmailId(emailId);
+//		userDetailsBean.setDob(dob);
 //
 //		ModelAndView modelAndView = new ModelAndView();
 //
-//		modelAndView.addObject("userDetailsService", userDetailsService);
+//		modelAndView.addObject("userDetailsBean", userDetailsBean);
 //
 //		modelAndView.setViewName("welcome");
 //
@@ -53,55 +52,32 @@ public class FormController {
 
 	@GetMapping(value = "/user_details")
 	public String showUsers(Model model) {
-		model.addAttribute("users", users);
+		model.addAttribute("users", userDetails.showUsers());
 		return "user_details";
 	}
 
 	@PostMapping(value = "/user_details")
-	public String handleUsers(Model model, @ModelAttribute UserDetailsService userDetailsService) {
-		userDetailsService.setId(counter.incrementAndGet());
-		users.add(userDetailsService);
-		model.addAttribute("users",users);
+	public String handleUsers(Model model, @ModelAttribute UserDetailsBean userDetailsBean) {
+		userDetails.addUser(userDetailsBean);
+		model.addAttribute("users",userDetails.showUsers());
 		return "user_details";
 	}
 
 	@PostMapping(value = "/update_details")
-	public String updateUserDetails(Model model, @ModelAttribute UserDetailsService userDetailsService) {
-		Iterator itr = users.iterator();
-		int i=0;
-		while (itr.hasNext()) {
-			UserDetailsService x = (UserDetailsService)itr.next();
-			if (x.getId() == userDetailsService.getId()){
-				users.set(i,userDetailsService);
-				break;
-			}
-			i++;
-		}
+	public String updateUserDetails(Model model, @ModelAttribute UserDetailsBean userDetailsBean) {
+		userDetails.updateUser(userDetailsBean);
 		return "redirect:/user_details";
 	}
 
 	@GetMapping(value = "/delete_user/{id}")
-	public String deleteUsers(@PathVariable("id") long id) {
-		Iterator itr = users.iterator();
-
-		while (itr.hasNext()) {
-			UserDetailsService x = (UserDetailsService)itr.next();
-			if (x.getId() == id)
-				itr.remove();
-		}
-
+	public String deleteUsers(@PathVariable("id") long Id) {
+		userDetails.deleteUser(Id);
 		return "redirect:/user_details";
 	}
 
 	@GetMapping(value = "/update_user/{id}")
-	public String updateUser(Model model, @PathVariable("id") long id) {
-		Iterator itr = users.iterator();
-
-		while (itr.hasNext()) {
-			UserDetailsService x = (UserDetailsService)itr.next();
-			if (x.getId() == id)
-				model.addAttribute("user", x);
-		}
+	public String updateUser(Model model, @PathVariable("id") Long Id) {
+		model.addAttribute("user", userDetails.getUser(Id));
 		return "update_user";
 	}
 
