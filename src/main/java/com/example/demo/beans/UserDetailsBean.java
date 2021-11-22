@@ -1,6 +1,8 @@
 package com.example.demo.beans;
 
+import org.springframework.stereotype.Component;
 
+@Component
 public class UserDetailsBean {
 	private String firstName;
     private String lastName;
