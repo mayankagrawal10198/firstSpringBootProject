@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.beans.UserDetailsBean;
 
 import com.example.demo.service.UserDetailsServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
@@ -17,16 +18,17 @@ import java.util.concurrent.atomic.AtomicLong;
 @Controller
 public class FormController {
 
-	UserDetailsServiceImpl userDetails = new UserDetailsServiceImpl();
+	@Autowired
+	UserDetailsServiceImpl userDetails;
 
 	@GetMapping("/")
 	public String redirectLogin() {
-		return "redirect:/add_user";
+		return "redirect:/addUser";
 	}
 
-	@GetMapping("/add_user")
+	@GetMapping("/addUser")
 	public String addUser() {
-		return "add_user";
+		return "addUser";
 	}
 
 //	@PostMapping(value = "/user-details")
@@ -50,35 +52,36 @@ public class FormController {
 //		return modelAndView;
 //	}
 
-	@GetMapping(value = "/user_details")
+	@GetMapping(value = "/userDetails")
 	public String showUsers(Model model) {
+
 		model.addAttribute("users", userDetails.showUsers());
-		return "user_details";
+		return "userDetails";
 	}
 
-	@PostMapping(value = "/user_details")
+	@PostMapping(value = "/userDetails")
 	public String handleUsers(Model model, @ModelAttribute UserDetailsBean userDetailsBean) {
 		userDetails.addUser(userDetailsBean);
 		model.addAttribute("users",userDetails.showUsers());
-		return "user_details";
+		return "userDetails";
 	}
 
-	@PostMapping(value = "/update_details")
+	@PostMapping(value = "/updateDetails")
 	public String updateUserDetails(Model model, @ModelAttribute UserDetailsBean userDetailsBean) {
 		userDetails.updateUser(userDetailsBean);
-		return "redirect:/user_details";
+		return "redirect:/userDetails";
 	}
 
-	@GetMapping(value = "/delete_user/{id}")
-	public String deleteUsers(@PathVariable("id") long Id) {
+	@GetMapping(value = "/deleteUser/{id}")
+	public String deleteUsers(@PathVariable("id") String Id) {
 		userDetails.deleteUser(Id);
-		return "redirect:/user_details";
+		return "redirect:/userDetails";
 	}
 
-	@GetMapping(value = "/update_user/{id}")
-	public String updateUser(Model model, @PathVariable("id") Long Id) {
+	@GetMapping(value = "/updateUser/{id}")
+	public String updateUser(Model model, @PathVariable("id") String Id) {
 		model.addAttribute("user", userDetails.getUser(Id));
-		return "update_user";
+		return "updateUser";
 	}
 
 }

@@ -8,7 +8,7 @@
 <title>Title</title>
 </head>
 <body>
-<form action="/user_details" method="post">
+<form action="/userDetails" method="post">
 	Enter Your First Name :- <input type="text" name="firstName"/>
 	Enter Your Second Name :- <input type="text" name="lastName"/>
 	Enter Your Email :- <input type="email" name="emailId"/>

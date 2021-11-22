@@ -1,14 +1,10 @@
 package com.example.demo.beans;
 
-import org.springframework.stereotype.Component;
-
-@Component
 public class UserDetailsBean {
 	private String firstName;
     private String lastName;
     private String emailId;
     private String dob;
-	private long id;
 
 	public UserDetailsBean() {
 		super();
@@ -20,15 +16,6 @@ public class UserDetailsBean {
 		this.lastName = ln;
 		this.emailId = e;
 		this.dob = d;
-		this.id = id;
-	}
-
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
 	}
 
 	public String getLastName() {

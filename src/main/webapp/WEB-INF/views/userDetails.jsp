@@ -13,16 +13,16 @@
 	<c:forEach items="${users}" var="user">
 		<div>
 				${user.value.toString()}
-				<a href="/update_user/${user.value.id}" >
+				<a href="/updateUser/${user.value.emailId}" >
 					<button>Update User</button>
 				</a>
-				<a href="/delete_user/${user.value.id}" >
+				<a href="/deleteUser/${user.value.emailId}" >
 					<button>Delete User</button>
 				</a>
 				<hr/>
 		</div>
 	</c:forEach>
-	<a href="/add_user" >
+	<a href="/addUser" >
 		<button>Add User</button>
 	</a>
 </body>

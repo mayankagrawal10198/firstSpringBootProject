@@ -8,8 +8,7 @@
 <title>Title</title>
 </head>
 <body>
-<form action="/update_details" method="post">
-	<input style="display: none" name="id" value="${user.id}">
+<form action="/updateDetails" method="post">
 	Enter Your First Name :- <input type="text" name="firstName" value="${user.firstName}"/>
 	Enter Your Second Name :- <input type="text" name="lastName" value="${user.lastName}"/>
 	Enter Your Email :- <input type="email" name="emailId" value="${user.emailId}"/>
