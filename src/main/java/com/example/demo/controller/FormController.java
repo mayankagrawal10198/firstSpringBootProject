@@ -54,34 +54,60 @@ public class FormController {
 
 	@GetMapping(value = "/userDetails")
 	public String showUsers(Model model) {
-
-		model.addAttribute("users", userDetails.showUsers());
-		return "userDetails";
+		if(!userDetails.showUsers().isEmpty()) {
+			model.addAttribute("users", userDetails.showUsers());
+			return "userDetails";
+		}
+		else {
+			model.addAttribute("msg", "No User Found!!!");
+			return "error";
+		}
 	}
 
 	@PostMapping(value = "/userDetails")
 	public String handleUsers(Model model, @ModelAttribute UserDetailsBean userDetailsBean) {
-		userDetails.addUser(userDetailsBean);
-		model.addAttribute("users",userDetails.showUsers());
-		return "userDetails";
+		if(userDetails.addUser(userDetailsBean)){
+			model.addAttribute("users",userDetails.showUsers());
+			return "userDetails";
+		}
+		else {
+			model.addAttribute("msg", "User Already Exists.");
+			return "error";
+		}
 	}
 
-	@PostMapping(value = "/updateDetails")
-	public String updateUserDetails(Model model, @ModelAttribute UserDetailsBean userDetailsBean) {
-		userDetails.updateUser(userDetailsBean);
-		return "redirect:/userDetails";
+	@PostMapping(value = "/updateUser/{id}")
+	public String updateUserDetails(Model model, @PathVariable("id") String Id, @ModelAttribute UserDetailsBean userDetailsBean) {
+		if(userDetails.updateUser(Id,userDetailsBean)) {
+			return "redirect:/userDetails";
+		}
+		else {
+			model.addAttribute("msg", "User Already Exists.");
+			return "error";
+		}
 	}
 
 	@GetMapping(value = "/deleteUser/{id}")
-	public String deleteUsers(@PathVariable("id") String Id) {
-		userDetails.deleteUser(Id);
-		return "redirect:/userDetails";
+	public String deleteUsers(Model model, @PathVariable("id") String Id) {
+		if(userDetails.deleteUser(Id)) {
+			return "redirect:/userDetails";
+		}
+		else {
+			model.addAttribute("msg", "User Does not Exists.");
+			return "error";
+		}
 	}
 
 	@GetMapping(value = "/updateUser/{id}")
 	public String updateUser(Model model, @PathVariable("id") String Id) {
-		model.addAttribute("user", userDetails.getUser(Id));
-		return "updateUser";
+		if(userDetails.getUser(Id) != null){
+			model.addAttribute("user", userDetails.getUser(Id));
+			return "updateUser";
+		}
+		else {
+			model.addAttribute("msg", "User Does not Exists.");
+			return "error";
+		}
 	}
 
 }

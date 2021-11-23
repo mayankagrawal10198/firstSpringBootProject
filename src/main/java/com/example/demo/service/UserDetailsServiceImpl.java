@@ -21,21 +21,17 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 
     @Override
     public HashMap<String,UserDetailsBean> showUsers(){
-        if(users != null) {
-            return users;
-        }
-        else  {
-            throw new ResponseStatusException(HttpStatus.NO_CONTENT);
-        }
+        return users;
     }
 
     @Override
-    public void addUser(UserDetailsBean user) {
+    public boolean addUser(UserDetailsBean user) {
         if(!checkDuplication(user)) {
             users.put(user.getEmailId(), user);
+            return true;
         }
         else {
-            throw new ResponseStatusException(HttpStatus.ALREADY_REPORTED);
+            return false;
         }
     }
 
@@ -45,27 +41,30 @@ public class UserDetailsServiceImpl implements UserDetailsService{
             return users.get(Id);
         }
         else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            return null;
         }
     }
 
     @Override
-    public void deleteUser(String Id) {
+    public boolean deleteUser(String Id) {
         if(users.containsKey(Id)){
             users.remove(Id);
+            return true;
         }
         else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            return false;
         }
     }
 
     @Override
-    public void updateUser(UserDetailsBean user) {
+    public boolean updateUser(String Id, UserDetailsBean user) {
         if(!checkDuplication(user)) {
             users.put(user.getEmailId(), user);
+            users.remove(Id);
+            return true;
         }
         else {
-            throw new ResponseStatusException(HttpStatus.ALREADY_REPORTED);
+            return false;
         }
     }
 
