@@ -8,12 +8,13 @@
 <title>Title</title>
 </head>
 <body>
-<form action="/userDetails" method="post">
-	Enter Your First Name :- <input type="text" name="firstName"/>
-	Enter Your Second Name :- <input type="text" name="lastName"/>
+<form action="/particularUser" method="post">
 	Enter Your Email :- <input type="email" name="emailId"/>
-	Enter Your Dob :- <input type="text" name="dob"/>
+	Enter Your Password :- <input type="password" name="password"/>
 	<button type="submit">Submit</button>
 </form>
+<a href="/signUp" >
+	<button>signUp</button>
+</a>
 </body>
 </html>

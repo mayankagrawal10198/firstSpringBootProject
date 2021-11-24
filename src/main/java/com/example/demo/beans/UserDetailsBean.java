@@ -1,21 +1,41 @@
 package com.example.demo.beans;
 
+import java.util.Date;
+
 public class UserDetailsBean {
 	private String firstName;
-    private String lastName;
-    private String emailId;
-    private String dob;
+	private String lastName;
+	private String emailId;
+	private String dob;
+	private String password;
+	private String date;
 
 	public UserDetailsBean() {
-		super();
+
 	}
 
-	public UserDetailsBean(String fn, String ln, String e, String d, long id) {
-		super();
+	public UserDetailsBean(String fn, String ln, String e, String d, String p) {
 		this.firstName = fn;
 		this.lastName = ln;
 		this.emailId = e;
 		this.dob = d;
+		this.password = p;
+	}
+
+	public String getDate() {
+		return date;
+	}
+
+	public void setDate(String date) {
+		this.date = date;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	public String getLastName() {

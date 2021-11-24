@@ -9,10 +9,11 @@
 <title>Welcome</title>
 </head>
 <body>
-
+    <h1>Hello Admin..</h1>
 	<c:forEach items="${users}" var="user">
 		<div>
 				${user.value.toString()}
+				<h4>Created/Updated on :- ${user.value.date}</h4>
 				<a href="/updateUser/${user.value.emailId}" >
 					<button>Update User</button>
 				</a>
@@ -22,7 +23,7 @@
 				<hr/>
 		</div>
 	</c:forEach>
-	<a href="/addUser" >
+	<a href="/signUp" >
 		<button>Add User</button>
 	</a>
 </body>
