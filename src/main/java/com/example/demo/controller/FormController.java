@@ -2,18 +2,14 @@ package com.example.demo.controller;
 
 import com.example.demo.beans.UserDetailsBean;
 
+import com.example.demo.beans.UserLoginBean;
 import com.example.demo.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Controller
 public class FormController {
@@ -23,12 +19,17 @@ public class FormController {
 
 	@GetMapping("/")
 	public String redirectLogin() {
-		return "redirect:/addUser";
+		return "redirect:/signUp";
 	}
 
-	@GetMapping("/addUser")
+	@RequestMapping("/signUp")
 	public String addUser() {
-		return "addUser";
+		return "signUp";
+	}
+
+	@RequestMapping("/login")
+	public String loginUser() {
+		return "login";
 	}
 
 //	@PostMapping(value = "/user-details")
@@ -51,24 +52,24 @@ public class FormController {
 //
 //		return modelAndView;
 //	}
+//
+//	@GetMapping(value = "/userDetails")
+//	public String showUsers(Model model) {
+//		if(!userDetails.showUsers().isEmpty()) {
+//			model.addAttribute("users", userDetails.showUsers());
+//			return "userDetails";
+//		}
+//		else {
+//			model.addAttribute("msg", "No User Found!!!");
+//			return "error";
+//		}
+//	}
 
-	@GetMapping(value = "/userDetails")
-	public String showUsers(Model model) {
-		if(!userDetails.showUsers().isEmpty()) {
-			model.addAttribute("users", userDetails.showUsers());
-			return "userDetails";
-		}
-		else {
-			model.addAttribute("msg", "No User Found!!!");
-			return "error";
-		}
-	}
-
-	@PostMapping(value = "/userDetails")
+	@PostMapping(value = "/newUser")
 	public String handleUsers(Model model, @ModelAttribute UserDetailsBean userDetailsBean) {
 		if(userDetails.addUser(userDetailsBean)){
-			model.addAttribute("users",userDetails.showUsers());
-			return "userDetails";
+			model.addAttribute("user",userDetails.getUser(userDetailsBean.getEmailId()));
+			return "particularUser";
 		}
 		else {
 			model.addAttribute("msg", "User Already Exists.");
@@ -76,10 +77,37 @@ public class FormController {
 		}
 	}
 
+	@PostMapping("/particularUser")
+	public String showDetails(Model model, @ModelAttribute UserLoginBean userLoginBean) {
+		if(userDetails.checkAdmin(userLoginBean.getEmailId(),userLoginBean.getPassword())){
+			model.addAttribute("users",userDetails.showAllUsers());
+			return "userDetails";
+		}
+		else if(userDetails.checkUser(userLoginBean.getEmailId(),userLoginBean.getPassword())) {
+			model.addAttribute("user", userDetails.getUser(userLoginBean.getEmailId()));
+			return "particularUser";
+		}
+		else {
+			model.addAttribute("msg", "Wrong Credentials!!!");
+			return "error";
+		}
+	}
+
+	@GetMapping("/particularUser/{id}")
+	public String showUser(Model model, @PathVariable("id") String Id) {
+		model.addAttribute("user", userDetails.getUser(Id));
+		return "particularUser";
+	}
+
 	@PostMapping(value = "/updateUser/{id}")
 	public String updateUserDetails(Model model, @PathVariable("id") String Id, @ModelAttribute UserDetailsBean userDetailsBean) {
 		if(userDetails.updateUser(Id,userDetailsBean)) {
-			return "redirect:/userDetails";
+			if(userDetails.checkAdmin(userDetails.getUserDetail().getEmailId(),userDetails.getUserDetail().getPassword())){
+				model.addAttribute("users",userDetails.showAllUsers());
+				return "userDetails";
+			}else {
+				return "redirect:/particularUser/" + Id;
+			}
 		}
 		else {
 			model.addAttribute("msg", "User Already Exists.");
@@ -90,7 +118,12 @@ public class FormController {
 	@GetMapping(value = "/deleteUser/{id}")
 	public String deleteUsers(Model model, @PathVariable("id") String Id) {
 		if(userDetails.deleteUser(Id)) {
-			return "redirect:/userDetails";
+			if(userDetails.checkAdmin(userDetails.getUserDetail().getEmailId(),userDetails.getUserDetail().getPassword())) {
+				model.addAttribute("users",userDetails.showAllUsers());
+				return "userDetails";
+			} else{
+				return "redirect:/login";
+			}
 		}
 		else {
 			model.addAttribute("msg", "User Does not Exists.");
@@ -109,5 +142,4 @@ public class FormController {
 			return "error";
 		}
 	}
-
 }
