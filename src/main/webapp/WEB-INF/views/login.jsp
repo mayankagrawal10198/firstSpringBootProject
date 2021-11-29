@@ -8,7 +8,7 @@
 <title>Title</title>
 </head>
 <body>
-<form action="/particularUser" method="post">
+<form action="/login" method="post">
 	Enter Your Email :- <input type="email" name="emailId"/>
 	Enter Your Password :- <input type="password" name="password"/>
 	<button type="submit">Submit</button>

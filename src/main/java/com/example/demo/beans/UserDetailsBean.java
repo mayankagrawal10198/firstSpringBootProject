@@ -3,8 +3,7 @@ package com.example.demo.beans;
 import java.util.Date;
 
 public class UserDetailsBean {
-	private String firstName;
-	private String lastName;
+	private String name;
 	private String emailId;
 	private String dob;
 	private String password;
@@ -14,12 +13,19 @@ public class UserDetailsBean {
 
 	}
 
-	public UserDetailsBean(String fn, String ln, String e, String d, String p) {
-		this.firstName = fn;
-		this.lastName = ln;
+	public UserDetailsBean(String fn, String e, String d, String p) {
+		this.name = fn;
 		this.emailId = e;
 		this.dob = d;
 		this.password = p;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getDate() {
@@ -38,19 +44,7 @@ public class UserDetailsBean {
 		this.password = password;
 	}
 
-	public String getLastName() {
-		return lastName;
-	}
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-	public String getFirstName() {
-		return firstName;
-	}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
 	public String getEmailId() {
 		return emailId;
 	}
@@ -66,8 +60,7 @@ public class UserDetailsBean {
 
 	@Override
 	public String toString() {
-		return  "First Name = '" + firstName + '\'' +
-				", Last Name = '" + lastName + '\'' +
+		return  "Name = '" + name + '\'' +
 				", Email Id = '" + emailId + '\'' +
 				", DOB = '" + dob + '\'';
 	}

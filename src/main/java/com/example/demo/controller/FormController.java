@@ -1,36 +1,27 @@
 package com.example.demo.controller;
 
+import com.example.demo.beans.ResponseBean;
 import com.example.demo.beans.UserDetailsBean;
 
 import com.example.demo.beans.UserLoginBean;
 import com.example.demo.service.UserDetailsServiceImpl;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 
-@Controller
+@CrossOrigin(origins = {"http://127.0.0.1:5500"})
+@RestController
 public class FormController {
 
 	@Autowired
 	UserDetailsServiceImpl userDetails;
-
-	@GetMapping("/")
-	public String redirectLogin() {
-		return "redirect:/signUp";
-	}
-
-	@RequestMapping("/signUp")
-	public String addUser() {
-		return "signUp";
-	}
-
-	@RequestMapping("/login")
-	public String loginUser() {
-		return "login";
-	}
 
 //	@PostMapping(value = "/user-details")
 //	public ModelAndView handleUserLogin(Model model, @RequestParam String firstName,
@@ -65,81 +56,98 @@ public class FormController {
 //		}
 //	}
 
-	@PostMapping(value = "/newUser")
-	public String handleUsers(Model model, @ModelAttribute UserDetailsBean userDetailsBean) {
+	@PostMapping(value = "/createUser")
+	public ResponseEntity<ResponseBean> handleUsers(@RequestBody UserDetailsBean userDetailsBean) {
+		ResponseBean response = new ResponseBean();
 		if(userDetails.addUser(userDetailsBean)){
-			model.addAttribute("user",userDetails.getUser(userDetailsBean.getEmailId()));
-			return "particularUser";
+			HttpHeaders headers = new HttpHeaders();
+			headers.add("Unique-Id", userDetailsBean.getEmailId());
+			response.setMessage("User is Added Successfully");
+			response.setId(userDetailsBean.getEmailId());
+			return new ResponseEntity<ResponseBean>(response, headers, HttpStatus.CREATED);
 		}
 		else {
-			model.addAttribute("msg", "User Already Exists.");
-			return "error";
+			response.setMessage("User Already Exists.");
+			response.setId(userDetailsBean.getEmailId());
+			return new ResponseEntity<ResponseBean>(response, HttpStatus.ALREADY_REPORTED);
 		}
 	}
 
-	@PostMapping("/particularUser")
-	public String showDetails(Model model, @ModelAttribute UserLoginBean userLoginBean) {
-		if(userDetails.checkAdmin(userLoginBean.getEmailId(),userLoginBean.getPassword())){
-			model.addAttribute("users",userDetails.showAllUsers());
-			return "userDetails";
-		}
-		else if(userDetails.checkUser(userLoginBean.getEmailId(),userLoginBean.getPassword())) {
-			model.addAttribute("user", userDetails.getUser(userLoginBean.getEmailId()));
-			return "particularUser";
-		}
-		else {
-			model.addAttribute("msg", "Wrong Credentials!!!");
-			return "error";
-		}
+	@GetMapping("/getAllUser")
+	public ResponseEntity showAllUser() {
+		return new ResponseEntity<HashMap<String, UserDetailsBean>>(userDetails.showAllUsers(), HttpStatus.ACCEPTED);
 	}
 
-	@GetMapping("/particularUser/{id}")
-	public String showUser(Model model, @PathVariable("id") String Id) {
-		model.addAttribute("user", userDetails.getUser(Id));
-		return "particularUser";
+
+	@GetMapping("/getUser/{id}")
+	public ResponseEntity showUser(@PathVariable("id") String Id) {
+		ResponseBean response = new ResponseBean();
+		if(userDetails.getUser(Id) != null) {
+			return new ResponseEntity<UserDetailsBean>(userDetails.getUser(Id), HttpStatus.ACCEPTED);
+		}
+		else {
+			response.setMessage("Id Not Found!!");
+			response.setId(Id);
+			return new ResponseEntity<ResponseBean>(response, HttpStatus.BAD_REQUEST);
+		}
 	}
 
 	@PostMapping(value = "/updateUser/{id}")
-	public String updateUserDetails(Model model, @PathVariable("id") String Id, @ModelAttribute UserDetailsBean userDetailsBean) {
+	public ResponseEntity updateUserDetails(@PathVariable("id") String Id, @RequestBody UserDetailsBean userDetailsBean) {
+		ResponseBean response = new ResponseBean();
 		if(userDetails.updateUser(Id,userDetailsBean)) {
 			if(userDetails.checkAdmin(userDetails.getUserDetail().getEmailId(),userDetails.getUserDetail().getPassword())){
-				model.addAttribute("users",userDetails.showAllUsers());
-				return "userDetails";
+				HttpHeaders headers = new HttpHeaders();
+				headers.add("Type", "admin");
+				return new ResponseEntity<HashMap<String, UserDetailsBean>>(userDetails.showAllUsers(), HttpStatus.ACCEPTED);
 			}else {
-				return "redirect:/particularUser/" + Id;
+				return new ResponseEntity<UserDetailsBean>(userDetails.getUser(Id), HttpStatus.ACCEPTED);
 			}
 		}
 		else {
-			model.addAttribute("msg", "User Already Exists.");
-			return "error";
+			response.setMessage("Id Not Found!!");
+			response.setId(Id);
+			return new ResponseEntity<ResponseBean>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
 
 	@GetMapping(value = "/deleteUser/{id}")
-	public String deleteUsers(Model model, @PathVariable("id") String Id) {
+	public ResponseEntity deleteUsers(@PathVariable("id") String Id) {
+		ResponseBean response = new ResponseBean();
 		if(userDetails.deleteUser(Id)) {
 			if(userDetails.checkAdmin(userDetails.getUserDetail().getEmailId(),userDetails.getUserDetail().getPassword())) {
-				model.addAttribute("users",userDetails.showAllUsers());
-				return "userDetails";
+				HttpHeaders headers = new HttpHeaders();
+				headers.add("Type", "admin");
+				return new ResponseEntity<HashMap<String, UserDetailsBean>>(userDetails.showAllUsers(), HttpStatus.ACCEPTED);
 			} else{
-				return "redirect:/login";
+				response.setMessage("User Details Deleted");
+				response.setId(Id);
+				return new ResponseEntity<ResponseBean>(response, HttpStatus.ACCEPTED);
 			}
 		}
 		else {
-			model.addAttribute("msg", "User Does not Exists.");
-			return "error";
+			response.setMessage("Id Not Found!!");
+			response.setId(Id);
+			return new ResponseEntity<ResponseBean>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
 
-	@GetMapping(value = "/updateUser/{id}")
-	public String updateUser(Model model, @PathVariable("id") String Id) {
-		if(userDetails.getUser(Id) != null){
-			model.addAttribute("user", userDetails.getUser(Id));
-			return "updateUser";
+	@PostMapping("/login")
+	public ResponseEntity showDetails(@RequestBody UserLoginBean userLoginBean) {
+		ResponseBean response = new ResponseBean();
+		if(userDetails.checkAdmin(userLoginBean.getEmailId(),userLoginBean.getPassword())){
+			HttpHeaders headers = new HttpHeaders();
+			headers.add("Type", "admin");
+			return new ResponseEntity<HashMap<String, UserDetailsBean>>(userDetails.showAllUsers(), HttpStatus.ACCEPTED);
+		}
+		else if(userDetails.checkUser(userLoginBean.getEmailId(),userLoginBean.getPassword())) {
+			return new ResponseEntity<UserDetailsBean>(userDetails.getUser(userLoginBean.getEmailId()), HttpStatus.ACCEPTED);
 		}
 		else {
-			model.addAttribute("msg", "User Does not Exists.");
-			return "error";
+			response.setMessage("Wrong Credentials.");
+			response.setId(userLoginBean.getEmailId());
+			return new ResponseEntity<ResponseBean>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
+
 }
